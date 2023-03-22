@@ -1,0 +1,56 @@
+import os
+import subprocess
+import requests
+
+# GitHub username and personal access token
+username = "your_github_username"
+token = "your_personal_access_token"
+
+# Name and description of the new repository
+repo_name = "new_repo"
+repo_description = "This is a new repository created with Python."
+
+# API endpoint for creating a new repository
+api_url = "https://api.github.com/user/repos"
+
+# JSON data for creating the new repository
+data = {
+    "name": repo_name,
+    "description": repo_description,
+    "private": False
+}
+
+# Send a POST request to create the new repository
+response = requests.post(api_url, json=data, auth=(username, token))
+
+# Check if the response was successful
+if response.status_code != 201:
+    print("Failed to create new repository.")
+    exit()
+
+# Path to your local git repository
+repo_path = "/path/to/your/local/repo"
+
+# Change directory to the repository
+os.chdir(repo_path)
+
+# Initialize the local repository
+subprocess.call(["git", "init"])
+
+# Add a remote origin to the repository
+remote_url = "https://github.com/" + username + "/" + repo_name + ".git"
+subprocess.call(["git", "remote", "add", "origin", remote_url])
+
+# Add some code to the repository
+with open("main.py", "w") as f:
+    f.write("print('Hello, world!')")
+
+# Add the file to the repository
+subprocess.call(["git", "add", "main.py"])
+
+# Commit the changes with a message
+commit_message = "Initial commit."
+subprocess.call(["git", "commit", "-m", commit_message])
+
+# Push the changes to the remote repository
+subprocess.call(["git", "push", "-u", "origin", "master"])
